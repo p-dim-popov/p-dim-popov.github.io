@@ -3,6 +3,7 @@ dist/
 .output/
 .tanstack/
 .nitro/
+.content-collections/
 *.log
 .env*
 .DS_Store

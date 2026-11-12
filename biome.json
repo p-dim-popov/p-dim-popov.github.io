@@ -4,6 +4,7 @@
 	"files": { "includes": ["**", "!src/routeTree.gen.ts"] },
 	"assist": { "actions": { "source": { "organizeImports": "on" } } },
 	"css": { "parser": { "tailwindDirectives": true } },
+	"markdown": { "parser": { "frontmatter": true } },
 	"linter": {
 		"rules": {
 			"preset": "recommended",
