@@ -3,3 +3,5 @@ export { type NavEntry, useNavEntries } from "./nav-entries";
 export { NotFoundPage } from "./not-found-page";
 export { type PageHeadInput, type PagePath, pageHead } from "./page-head";
 export { createSiteDocument, type SiteDocumentOptions } from "./site-document";
+export { SiteFooter, type SiteFooterProps } from "./site-footer";
+export { SiteNav, type SiteNavProps } from "./site-nav";
