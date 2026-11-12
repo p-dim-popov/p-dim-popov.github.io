@@ -6,3 +6,4 @@ export { RouterTextLink } from "./router-text-link";
 export { createSiteDocument, type SiteDocumentOptions } from "./site-document";
 export { SiteFooter, type SiteFooterProps } from "./site-footer";
 export { SiteNav, type SiteNavProps } from "./site-nav";
+export { prefixIsNotAPage } from "./url-prefix";

@@ -1,8 +1,6 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { prefixIsNotAPage } from "#platform/site";
 
-// `/_/` is a URL prefix, not a page.
 export const Route = createFileRoute("/_/")({
-	beforeLoad: () => {
-		throw notFound();
-	},
+	beforeLoad: prefixIsNotAPage,
 });
