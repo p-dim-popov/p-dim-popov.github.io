@@ -13,8 +13,9 @@
 		"typecheck": "tsc --noEmit",
 		"lint": "biome check .",
 		"format": "biome check --write .",
+		"boundaries": "depcruise src --config .dependency-cruiser.mjs --output-type err-long",
 		"test": "vitest run",
-		"check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"
+		"check": "pnpm typecheck && pnpm lint && pnpm boundaries && pnpm test && pnpm build"
 	},
 	"dependencies": {
 		"@tanstack/react-router": "^1.170.46",
