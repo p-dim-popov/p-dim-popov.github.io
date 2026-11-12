@@ -23,6 +23,7 @@ The Site is prerendered with TanStack Start and served as static files by GitHub
 - **URLs.** Home is `/`. Every other page, the assets and every other public file live under `/_/`, written `[_]` in route paths (a bare leading `_` is a pathless layout). Every URL ends with `/` (ADR 0001).
 - **Static only.** The Site has no server runtime, so server functions 404. Loaders run at build time and again in the browser, so whatever a loader reads ships in the client bundle (ADR 0002).
 - **Not-found.** URLs that match no route reach not-found on their own; a route whose param matches nothing (an unknown Post slug) throws `notFound()`. The root route's not-found component is the one not-found page, and the build saves it as `404.html` through `src/server.ts` (ADR 0002 explains why a `/404` route breaks hydration).
+- **Head and sitemap.** A page's own route returns `pageHead()` from `#platform/site` in `head()`, which sets the title, description, canonical URL and Open Graph tags. The root route's head holds document-wide tags only: the router does not deduplicate links, so a canonical URL there would appear twice. Start's sitemap lists every static route that has a component and every link the prerender crawls, so a dynamic page (a Post) is listed once a prerendered page links to it. The `pages` entries in `vite.config.ts` keep `/_/` and not-found out.
 
 `pnpm boundaries` (dependency-cruiser) enforces the import rules; each error names the rule and how to fix it.
 
