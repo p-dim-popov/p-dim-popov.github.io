@@ -1,5 +1,6 @@
 import { rm } from "node:fs/promises";
 import { join } from "node:path";
+import contentCollections from "@content-collections/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
@@ -33,6 +34,10 @@ export default defineConfig({
 	build: { assetsDir: "_/assets" },
 	plugins: [
 		tailwindcss(),
+		// Posts: generates the `content-collections` module (see the config file).
+		contentCollections({
+			configPath: "src/features/blog/content-collections.ts",
+		}),
 		tanstackStart({
 			prerender: { enabled: true, crawlLinks: true, failOnError: true },
 			pages: [

@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as Char91_Char93RouteRouteImport } from './routes/[_]/route'
 import { Route as Char91_Char93IndexRouteImport } from './routes/[_]/index'
+import { Route as Char91_Char93BlogIndexRouteImport } from './routes/[_]/blog/index'
+import { Route as Char91_Char93BlogSlugIndexRouteImport } from './routes/[_]/blog/$slug/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,28 +30,45 @@ const Char91_Char93IndexRoute = Char91_Char93IndexRouteImport.update({
   path: '/',
   getParentRoute: () => Char91_Char93RouteRoute,
 } as any)
+const Char91_Char93BlogIndexRoute = Char91_Char93BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => Char91_Char93RouteRoute,
+} as any)
+const Char91_Char93BlogSlugIndexRoute =
+  Char91_Char93BlogSlugIndexRouteImport.update({
+    id: '/blog/$slug/',
+    path: '/blog/$slug/',
+    getParentRoute: () => Char91_Char93RouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/_': typeof Char91_Char93RouteRouteWithChildren
   '/_/': typeof Char91_Char93IndexRoute
+  '/_/blog/': typeof Char91_Char93BlogIndexRoute
+  '/_/blog/$slug/': typeof Char91_Char93BlogSlugIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/_': typeof Char91_Char93IndexRoute
+  '/_/blog': typeof Char91_Char93BlogIndexRoute
+  '/_/blog/$slug': typeof Char91_Char93BlogSlugIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_': typeof Char91_Char93RouteRouteWithChildren
   '/_/': typeof Char91_Char93IndexRoute
+  '/_/blog/': typeof Char91_Char93BlogIndexRoute
+  '/_/blog/$slug/': typeof Char91_Char93BlogSlugIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/_' | '/_/'
+  fullPaths: '/' | '/_' | '/_/' | '/_/blog/' | '/_/blog/$slug/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/_'
-  id: '__root__' | '/' | '/_' | '/_/'
+  to: '/' | '/_' | '/_/blog' | '/_/blog/$slug'
+  id: '__root__' | '/' | '/_' | '/_/' | '/_/blog/' | '/_/blog/$slug/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -80,15 +99,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91_Char93IndexRouteImport
       parentRoute: typeof Char91_Char93RouteRoute
     }
+    '/_/blog/': {
+      id: '/_/blog/'
+      path: '/blog'
+      fullPath: '/_/blog/'
+      preLoaderRoute: typeof Char91_Char93BlogIndexRouteImport
+      parentRoute: typeof Char91_Char93RouteRoute
+    }
+    '/_/blog/$slug/': {
+      id: '/_/blog/$slug/'
+      path: '/blog/$slug'
+      fullPath: '/_/blog/$slug/'
+      preLoaderRoute: typeof Char91_Char93BlogSlugIndexRouteImport
+      parentRoute: typeof Char91_Char93RouteRoute
+    }
   }
 }
 
 interface Char91_Char93RouteRouteChildren {
   Char91_Char93IndexRoute: typeof Char91_Char93IndexRoute
+  Char91_Char93BlogIndexRoute: typeof Char91_Char93BlogIndexRoute
+  Char91_Char93BlogSlugIndexRoute: typeof Char91_Char93BlogSlugIndexRoute
 }
 
 const Char91_Char93RouteRouteChildren: Char91_Char93RouteRouteChildren = {
   Char91_Char93IndexRoute: Char91_Char93IndexRoute,
+  Char91_Char93BlogIndexRoute: Char91_Char93BlogIndexRoute,
+  Char91_Char93BlogSlugIndexRoute: Char91_Char93BlogSlugIndexRoute,
 }
 
 const Char91_Char93RouteRouteWithChildren =

@@ -13,7 +13,12 @@
 		"verbatimModuleSyntax": true,
 		"allowImportingTsExtensions": true,
 		"skipLibCheck": true,
-		"noEmit": true
+		"noEmit": true,
+		"paths": {
+			"content-collections": [
+				"./src/features/blog/.content-collections/generated"
+			]
+		}
 	},
 	"include": ["src", "vite.config.ts", "vitest.config.ts"]
 }

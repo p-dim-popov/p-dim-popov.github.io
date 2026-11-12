@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 const sizes = {
 	display: "text-display",
 	title: "text-title",
+	section: "text-section",
 } as const;
 
 export type HeadingProps = {

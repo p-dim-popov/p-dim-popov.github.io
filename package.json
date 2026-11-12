@@ -3,22 +3,27 @@
 	"private": true,
 	"type": "module",
 	"packageManager": "pnpm@12.18.0",
+	"sideEffects": [
+		"**/*.css"
+	],
 	"imports": {
 		"#platform/*": "./src/platform/*/index.ts",
 		"#features/*": "./src/features/*/index.ts"
 	},
 	"scripts": {
 		"dev": "vite dev",
-		"build": "vite build",
+		"content": "content-collections build --config src/features/blog/content-collections.ts",
+		"build": "pnpm content && vite build",
 		"serve:pages": "node scripts/serve-pages.mjs",
-		"typecheck": "tsc --noEmit",
+		"typecheck": "pnpm content && tsc --noEmit",
 		"lint": "biome check .",
 		"format": "biome check --write .",
-		"boundaries": "depcruise src --config .dependency-cruiser.mjs --output-type err-long",
+		"boundaries": "pnpm content && depcruise src --config .dependency-cruiser.mjs --output-type err-long",
 		"test": "vitest run",
 		"check": "pnpm typecheck && pnpm lint && pnpm boundaries && pnpm test && pnpm build"
 	},
 	"dependencies": {
+		"@tanstack/markdown": "^1.2.0",
 		"@tanstack/react-router": "^1.170.46",
 		"@tanstack/react-start": "^1.169.5",
 		"react": "^19.3.1",
@@ -26,6 +31,9 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.6.6",
+		"@content-collections/cli": "^0.1.9",
+		"@content-collections/core": "^0.15.3",
+		"@content-collections/vite": "^0.3.1",
 		"@tailwindcss/vite": "^4.3.5",
 		"@types/node": "^26.6.6",
 		"@types/react": "^19.3.0",
@@ -35,6 +43,7 @@
 		"tailwindcss": "^4.3.5",
 		"typescript": "^6.0.3",
 		"vite": "^8.3.8",
-		"vitest": "^5.1.0"
+		"vitest": "^5.1.0",
+		"zod": "^4.6.7"
 	}
 }
