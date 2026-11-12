@@ -24,6 +24,7 @@ The Site is prerendered with TanStack Start and served as static files by GitHub
 - **Static only.** The Site has no server runtime, so server functions 404. Loaders run at build time and again in the browser, so whatever a loader reads ships in the client bundle (ADR 0002).
 - **Not-found.** URLs that match no route reach not-found on their own; a route whose param matches nothing (an unknown Post slug) throws `notFound()`. The root route's not-found component is the one not-found page, and the build saves it as `404.html` through `src/server.ts` (ADR 0002 explains why a `/404` route breaks hydration).
 - **Styling.** Tailwind CSS v4 (ADR 0004). `src/platform/design-system/tokens.css` declares every token with the one theme's values. The default theme is removed, so only those tokens produce utilities. Other modules style only through `design-system`'s primitives and token utilities, and each part of the Site lays out its pages with token utilities on its own elements. Biome's `nursery/noTailwindArbitraryValue` fails lint on an arbitrary `[...]` value outside `design-system`. It reads only `className`/`class` attributes and class helpers such as `clsx()`, so keep class strings there, not in plain variables.
+- **Posts.** A Post is a Markdown file, `src/features/blog/posts/<slug>.md`, loaded with Content Collections (`src/features/blog/content-collections.ts`) and rendered with `@tanstack/markdown`. Its frontmatter is `title`, `description` and `publishedOn` (`YYYY-MM-DD`). A missing or invalid key, or any other key, fails the build. The body's headings start at `##`, because the title is the page's `<h1>`. `blog`'s public API keeps summaries (`postSummaries`, newest first) apart from bodies: the Post route's loader imports the bodies on demand, so a page that lists Posts never ships one.
 - **Head and sitemap.** A page's own route returns `pageHead()` from `#platform/site` in `head()`, which sets the title, description, canonical URL and Open Graph tags. The root route's head holds document-wide tags only: the router does not deduplicate links, so a canonical URL there would appear twice. Start's sitemap lists every static route that has a component and every link the prerender crawls, so a dynamic page (a Post) is listed once a prerendered page links to it. The `pages` entries in `vite.config.ts` keep `/_/` and not-found out.
 
 `pnpm boundaries` (dependency-cruiser) enforces the import rules; each error names the rule and how to fix it.
@@ -34,7 +35,8 @@ First run: `mise install` (Node from `mise.toml`), then `pnpm install` (pnpm swi
 
 - `pnpm check` runs what the pull-request workflow runs, in order: `typecheck`, `lint` (Biome), `boundaries`, `test` (Vitest), `build`. Run it before you call a change done.
 - `pnpm format` applies Biome's formatting and import order.
-- `pnpm build` prerenders the Site into `dist/client/`. A broken internal link or a failing route fails it.
+- `pnpm content` validates every Post's frontmatter and generates the `content-collections` module into `src/features/blog/.content-collections/` (git-ignored). `typecheck`, `boundaries` and `build` run it first, so each works on a fresh checkout.
+- `pnpm build` prerenders the Site into `dist/client/`. Invalid frontmatter, a broken internal link (in a Post too) or a failing route fails it.
 - `pnpm serve:pages <port>` serves `dist/client/` the way GitHub Pages does (see below).
 
 Toolchain gotchas:
@@ -42,6 +44,10 @@ Toolchain gotchas:
 - `src/routeTree.gen.ts` is generated from `src/routes/` by `pnpm build` and `pnpm dev`. Commit it and leave it unedited. After adding or renaming a route file, run `pnpm build` before `pnpm typecheck`.
 - TypeScript stays on 6.x: dependency-cruiser reads `.ts` files through the TypeScript compiler API, which TypeScript 7 does not ship.
 - Biome is pinned to an exact version: the arbitrary-value rule is a nursery rule, and nursery rules can change in any release. Upgrade Biome on purpose and re-check that the rule still fires.
+- Build with `pnpm build`, not a bare `vite build`. The Content Collections Vite plugin fails on invalid frontmatter only when `NODE_ENV` is `production`; `pnpm content` fails whatever `NODE_ENV` is.
+- `package.json` declares `"sideEffects": ["**/*.css"]`, so the bundler drops the unused re-exports of a module's `index.ts`. Without it, every page shipped the Markdown renderer. A file that must run only for its side effects needs an entry there.
+- `pnpm-workspace.yaml` approves esbuild's install script (`allowBuilds`), which Content Collections needs. pnpm fails the install on a dependency whose build script is not approved.
+- Biome formats Markdown, and `markdown.parser.frontmatter` keeps it from rewriting a Post's frontmatter as a heading.
 - Tests go in `src/**/*.test.ts(x)` and cover generic logic through a module's public API. Content, configuration, navigation and framework behaviour get no tests; the build and the browser check cover them.
 
 ## Verifying in a browser
