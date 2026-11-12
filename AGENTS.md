@@ -39,6 +39,7 @@ Toolchain gotchas:
 
 - `src/routeTree.gen.ts` is generated from `src/routes/` by `pnpm build` and `pnpm dev`. Commit it and leave it unedited. After adding or renaming a route file, run `pnpm build` before `pnpm typecheck`.
 - TypeScript stays on 6.x: dependency-cruiser reads `.ts` files through the TypeScript compiler API, which TypeScript 7 does not ship.
+- Biome is pinned to an exact version: the arbitrary-value rule is a nursery rule, and nursery rules can change in any release. Upgrade Biome on purpose and re-check that the rule still fires.
 - Tests go in `src/**/*.test.ts(x)` and cover generic logic through a module's public API. Content, configuration, navigation and framework behaviour get no tests; the build and the browser check cover them.
 
 ## Verifying in a browser
