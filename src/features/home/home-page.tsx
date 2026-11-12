@@ -1,8 +1,7 @@
 import { Heading, Text } from "#platform/design-system";
-import { useNavEntries } from "#platform/site";
+import { RouterTextLink, useNavEntries } from "#platform/site";
 import { LatestPosts } from "./latest-posts";
 import { homeNavEntry } from "./nav-entry";
-import { RouterTextLink } from "./router-text-link";
 
 /**
  * Home frames itself: it uses neither `SiteNav` nor `SiteFooter`, and builds its own links to

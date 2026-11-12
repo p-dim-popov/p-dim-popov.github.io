@@ -1,8 +1,8 @@
 import { Heading, Text } from "#platform/design-system";
+import { RouterTextLink } from "#platform/site";
 import { BlogLayout } from "./blog-layout";
 import { PostDate } from "./post-date";
 import { postLinkOptions, postSummaries } from "./post-summaries";
-import { RouterTextLink } from "./router-text-link";
 
 /** The Blog index: every Post, newest first. */
 export function BlogIndexPage() {

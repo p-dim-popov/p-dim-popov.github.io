@@ -1,6 +1,6 @@
 import { PostDate, postLinkOptions, postSummaries } from "#features/blog";
 import { Heading, Text } from "#platform/design-system";
-import { RouterTextLink } from "./router-text-link";
+import { RouterTextLink } from "#platform/site";
 
 /** How many Posts Home lists. */
 const LATEST_POST_COUNT = 3;

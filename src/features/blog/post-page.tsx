@@ -1,9 +1,9 @@
 import { getRouteApi } from "@tanstack/react-router";
 import { Heading, Text } from "#platform/design-system";
+import { RouterTextLink } from "#platform/site";
 import { BlogLayout } from "./blog-layout";
 import { PostBody } from "./post-body";
 import { PostDate } from "./post-date";
-import { RouterTextLink } from "./router-text-link";
 
 /** The Post page's route, read by id: nothing imports route files. */
 const postRoute = getRouteApi("/_/blog/$slug/");

@@ -1,6 +1,6 @@
 import { Markdown, type MarkdownComponents } from "@tanstack/markdown/react";
 import { Heading, Text, TextLink } from "#platform/design-system";
-import { RouterTextLink } from "./router-text-link";
+import { RouterTextLink } from "#platform/site";
 
 /**
  * How each Markdown element renders: through `design-system` where it has a primitive,
