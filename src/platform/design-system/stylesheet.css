@@ -1,0 +1,12 @@
+/*
+ * The Site's one stylesheet. Tailwind scans `src/` (relative to this file) for class names.
+ */
+@import "tailwindcss" source("../../");
+@import "./tokens.css";
+
+@layer base {
+	html {
+		background-color: var(--color-paper);
+		color: var(--color-ink);
+	}
+}

@@ -1,5 +1,6 @@
 import { rm } from "node:fs/promises";
 import { join } from "node:path";
+import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import { defineConfig, type Plugin } from "vite";
@@ -31,6 +32,7 @@ export default defineConfig({
 	// Everything but Home and the crawl files lives under `/_/` (ADR 0001).
 	build: { assetsDir: "_/assets" },
 	plugins: [
+		tailwindcss(),
 		tanstackStart({
 			prerender: { enabled: true, crawlLinks: true, failOnError: true },
 			pages: [
