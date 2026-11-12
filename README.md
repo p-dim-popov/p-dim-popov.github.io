@@ -4,7 +4,7 @@ This repository is the source of the personal Site of Petar Popov, published at 
 
 ## The Site
 
-The Site introduces its owner and publishes the owner's writing. It has these parts:
+The Site introduces its owner and publishes the owner's Posts. It has these parts:
 
 - **Home** (`/`) introduces the owner, leads to the rest of the Site and lists the latest Posts.
 - **Blog** (`/_/blog/`) lists every Post, newest first. Each Post has its own page at `/_/blog/<slug>/`.

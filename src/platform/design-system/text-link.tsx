@@ -1,6 +1,6 @@
 import type { ComponentPropsWithRef } from "react";
 
-const look =
+const textLinkClasses =
 	"text-accent underline underline-offset-4 hover:decoration-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 
 export type TextLinkProps = ComponentPropsWithRef<"a">;
@@ -11,7 +11,12 @@ export type TextLinkProps = ComponentPropsWithRef<"a">;
  */
 export function TextLink({ className, children, ...props }: TextLinkProps) {
 	return (
-		<a {...props} className={className ? `${look} ${className}` : look}>
+		<a
+			{...props}
+			className={
+				className ? `${textLinkClasses} ${className}` : textLinkClasses
+			}
+		>
 			{children}
 		</a>
 	);

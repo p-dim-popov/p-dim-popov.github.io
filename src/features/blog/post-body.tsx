@@ -1,28 +1,28 @@
 import { Markdown, type MarkdownComponents } from "@tanstack/markdown/react";
+import type { ReactNode } from "react";
 import { Heading, Text, TextLink } from "#platform/design-system";
-import { RouterTextLink } from "./router-text-link";
+import { RouterTextLink } from "#platform/site";
+
+/**
+ * A heading in a Post's body, at its Markdown level and the section size. The Post's title is
+ * the page's `<h1>`, so a Post's own headings start at `##`.
+ */
+function postHeading(level: 2 | 3 | 4) {
+	return ({ children }: { children?: ReactNode }) => (
+		<Heading level={level} size="section">
+			{children}
+		</Heading>
+	);
+}
 
 /**
  * How each Markdown element renders: through `design-system` where it has a primitive,
  * otherwise with token utilities.
  */
 const components = {
-	// The Post's title is the page's `<h1>`, so a Post's own headings start at `##`.
-	h2: ({ children }) => (
-		<Heading level={2} size="section">
-			{children}
-		</Heading>
-	),
-	h3: ({ children }) => (
-		<Heading level={3} size="section">
-			{children}
-		</Heading>
-	),
-	h4: ({ children }) => (
-		<Heading level={4} size="section">
-			{children}
-		</Heading>
-	),
+	h2: postHeading(2),
+	h3: postHeading(3),
+	h4: postHeading(4),
 	p: ({ children }) => <Text>{children}</Text>,
 	// Links to other pages of the Site navigate through the router, which also adds the
 	// trailing slash. The prerender crawls them, so a broken one fails the build.

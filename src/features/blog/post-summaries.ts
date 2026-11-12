@@ -1,4 +1,3 @@
-import { linkOptions } from "@tanstack/react-router";
 import { allPostSummaries } from "content-collections";
 
 /** What a list of Posts shows: everything about a Post except its body. */
@@ -24,12 +23,4 @@ export const postSummaries: readonly PostSummary[] = allPostSummaries.toSorted(
 
 export function findPostSummary(slug: string): PostSummary | undefined {
 	return postSummaries.find((post) => post.slug === slug);
-}
-
-/**
- * Where a Post's page is, as router link options:
- * `<Link {...postLinkOptions(post)}>` or any `createLink` component.
- */
-export function postLinkOptions({ slug }: Pick<PostSummary, "slug">) {
-	return linkOptions({ to: "/_/blog/$slug/", params: { slug } });
 }
