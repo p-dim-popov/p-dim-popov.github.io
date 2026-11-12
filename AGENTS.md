@@ -23,6 +23,7 @@ The Site is prerendered with TanStack Start and served as static files by GitHub
 - **URLs.** Home is `/`. Every other page, the assets and every other public file live under `/_/`, written `[_]` in route paths (a bare leading `_` is a pathless layout). Every URL ends with `/` (ADR 0001).
 - **Static only.** The Site has no server runtime, so server functions 404. Loaders run at build time and again in the browser, so whatever a loader reads ships in the client bundle (ADR 0002).
 - **Not-found.** URLs that match no route reach not-found on their own; a route whose param matches nothing (an unknown Post slug) throws `notFound()`. The root route's not-found component is the one not-found page, and the build saves it as `404.html` through `src/server.ts` (ADR 0002 explains why a `/404` route breaks hydration).
+- **Styling.** Tailwind CSS v4 (ADR 0004). `src/platform/design-system/tokens.css` declares every token with the one theme's values. The default theme is removed, so only those tokens produce utilities. Other modules style only through `design-system`'s primitives and token utilities, and each part of the Site lays out its pages with token utilities on its own elements. Biome's `nursery/noTailwindArbitraryValue` fails lint on an arbitrary `[...]` value outside `design-system`. It reads only `className`/`class` attributes and class helpers such as `clsx()`, so keep class strings there, not in plain variables.
 
 `pnpm boundaries` (dependency-cruiser) enforces the import rules; each error names the rule and how to fix it.
 
