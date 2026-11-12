@@ -2,11 +2,12 @@ import { getRouteApi } from "@tanstack/react-router";
 import { Heading, Text } from "#platform/design-system";
 import { RouterTextLink } from "#platform/site";
 import { BlogLayout } from "./blog-layout";
+import { BLOG_INDEX_PATH, POST_ROUTE_PATH } from "./blog-paths";
 import { PostBody } from "./post-body";
 import { PostDate } from "./post-date";
 
 /** The Post page's route, read by id: nothing imports route files. */
-const postRoute = getRouteApi("/_/blog/$slug/");
+const postRoute = getRouteApi(POST_ROUTE_PATH);
 
 /** One Post, from the data its route's loader (`loadPost`) returns. */
 export function PostPage() {
@@ -23,7 +24,7 @@ export function PostPage() {
 				<PostBody markdown={post.body} />
 			</article>
 			<Text>
-				<RouterTextLink to="/_/blog/" activeOptions={{ exact: true }}>
+				<RouterTextLink to={BLOG_INDEX_PATH} activeOptions={{ exact: true }}>
 					All Posts
 				</RouterTextLink>
 			</Text>
