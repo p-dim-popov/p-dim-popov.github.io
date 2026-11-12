@@ -1,6 +1,8 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
+import { blogNavEntry } from "#features/blog";
+import { homeNavEntry } from "#features/home";
 import { stylesheetHref } from "#platform/design-system";
-import { NotFoundPage, SiteDocument } from "#platform/site";
+import { createSiteDocument, NotFoundPage } from "#platform/site";
 
 export const Route = createRootRoute({
 	// Document-wide tags only. Each page's own route head (or the not-found page)
@@ -12,7 +14,9 @@ export const Route = createRootRoute({
 		],
 		links: [{ rel: "stylesheet", href: stylesheetHref }],
 	}),
-	shellComponent: SiteDocument,
+	// The nav entries, assembled once, in nav order. Each feature exports its own entry, and the
+	// shell provides them to every page, so no feature imports another just to link to it.
+	shellComponent: createSiteDocument({ nav: [homeNavEntry, blogNavEntry] }),
 	component: Outlet,
 	notFoundComponent: NotFoundPage,
 });
