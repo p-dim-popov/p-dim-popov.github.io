@@ -1,0 +1,18 @@
+{
+	"$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+	"vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+	"files": { "includes": ["**", "!src/routeTree.gen.ts"] },
+	"assist": { "actions": { "source": { "organizeImports": "on" } } },
+	"linter": {
+		"rules": {
+			"preset": "recommended",
+			"performance": { "noBarrelFile": "error", "noReExportAll": "error" }
+		}
+	},
+	"overrides": [
+		{
+			"includes": ["src/platform/*/index.ts", "src/features/*/index.ts"],
+			"linter": { "rules": { "performance": { "noBarrelFile": "off" } } }
+		}
+	]
+}
