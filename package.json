@@ -3,6 +3,9 @@
 	"private": true,
 	"type": "module",
 	"packageManager": "pnpm@12.18.0",
+	"sideEffects": [
+		"**/*.css"
+	],
 	"imports": {
 		"#platform/*": "./src/platform/*/index.ts",
 		"#features/*": "./src/features/*/index.ts"
