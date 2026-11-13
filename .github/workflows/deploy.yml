@@ -1,0 +1,64 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  # Re-runs a deploy by hand, for example after Pages is first set to deploy from Actions.
+  workflow_dispatch:
+
+# Each job grants itself only what it needs.
+permissions: {}
+
+# One deploy at a time. A newer push waits for the running deploy to finish instead of
+# canceling it.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # configure-pages reads the Pages settings and fails early if Pages is not set up.
+      pages: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # Reads the pnpm version from the `packageManager` field in package.json.
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: mise.toml
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Prerenders every page into dist/client/, the root of the published Site.
+      - name: Prerendered build
+        run: pnpm build
+
+      - uses: actions/configure-pages@v6
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist/client
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      # Lets deploy-pages prove to Pages that this run is allowed to deploy.
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
