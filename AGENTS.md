@@ -33,11 +33,11 @@ The Site is prerendered with TanStack Start and served as static files by GitHub
 
 ## Commands
 
-mise installs the toolchain and runs every task (ADR 0005). First run: `mise install`. It installs Node and pnpm, and on a development machine also agent-browser and the browser it drives. Each task installs the npm dependencies first when `package.json`, `pnpm-lock.yaml` or `pnpm-workspace.yaml` has changed. `mise tasks ls` lists every task.
+mise installs the toolchain and runs every task (ADR 0005). First run: `mise install`. It installs Node and pnpm, and on a development machine also agent-browser and the browser it drives. Each task that needs the npm dependencies installs them first when `package.json`, `pnpm-lock.yaml` or `pnpm-workspace.yaml` has changed. `mise tasks ls` lists every task.
 
 - `mise run check` runs what the pull-request workflow runs: `typecheck`, `lint` (Biome), `boundaries`, `test` (Vitest) and `build`, in parallel. It stops at the first failure; `mise run --continue-on-error check` reports every failure, as CI does. Run it before you call a change done.
 - `mise run format` applies Biome's formatting and import order.
-- `mise run content` validates every Post's frontmatter and generates the `content-collections` module into `src/features/blog/.content-collections/` (git-ignored). `typecheck`, `boundaries` and `build` depend on it, so each works on a fresh checkout. It is skipped when neither the Posts nor its config has changed.
+- `mise run content` validates every Post's frontmatter and generates the `content-collections` module into `src/features/blog/.content-collections/` (git-ignored). `typecheck`, `boundaries` and `build` depend on it, so each works on a fresh checkout. It runs again only when a Post, its config or `pnpm-lock.yaml` has changed, or its output is missing.
 - `mise run build` prerenders the Site into `dist/client/`. Invalid frontmatter, a broken internal link (in a Post too) or a failing route fails it.
 - `mise run serve:pages <port>` serves `dist/client/` the way GitHub Pages does (see below). The port defaults to 4173.
 - `mise run dev` starts the development server.

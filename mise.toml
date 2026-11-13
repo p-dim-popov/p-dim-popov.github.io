@@ -5,6 +5,8 @@
 # Each version here names a major (a minor for a 0.x tool). `mise.lock` holds the exact
 # version and checksum; `mise upgrade` moves it.
 
+# The version this setup was built and tested on. Older versions may misread `.miserc.toml`,
+# the per-environment lockfiles or the tasks.
 min_version = "2026.10.11"
 
 [tools]
@@ -21,6 +23,8 @@ run = ["pnpm install", "touch node_modules/.modules.yaml"]
 sources = ["package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml"]
 outputs = ["node_modules/.modules.yaml"]
 
+# `pnpm-lock.yaml` is a source too: a new Content Collections or zod version can change what
+# the build accepts or generates.
 [tasks.content]
 description = "Validate every Post's frontmatter and generate the content-collections module"
 depends = ["install"]
@@ -40,6 +44,10 @@ run = "pnpm exec vite dev"
 [tasks.build]
 description = "Prerender the Site into dist/client/"
 depends = ["content"]
+# The Content Collections Vite plugin rewrites `.content-collections/` during the build. When
+# `check` runs typecheck and boundaries too, the build waits for them, so they never read a
+# half-written file. A plain `mise run build` waits for nothing.
+wait_for = ["typecheck", "boundaries"]
 run = "pnpm exec vite build"
 
 [tasks.typecheck]

@@ -65,7 +65,7 @@ A Post is a Markdown file in `src/features/blog/posts/`. [Content Collections](h
 
 ## Development
 
-Install [mise](https://mise.jdx.dev/). It installs Node, pnpm and the other tools at the versions locked in `mise.lock` and `mise.dev.lock`, and it runs every task. Each task installs the npm dependencies first when they have changed.
+Install [mise](https://mise.jdx.dev/). It installs Node, pnpm and the other tools at the versions locked in `mise.lock` and `mise.dev.lock`, and it runs every task. Each task that needs the npm dependencies installs them first when they have changed.
 
 ```sh
 mise install             # install the tools
@@ -80,7 +80,7 @@ mise tasks ls            # list every task
 
 ## CI and deployment
 
-- On every pull request, the `CI` workflow ([`ci.yml`](.github/workflows/ci.yml)) runs `mise run check`, the same checks as locally.
+- On every pull request, the `CI` workflow ([`ci.yml`](.github/workflows/ci.yml)) runs `mise run --continue-on-error check`: the same checks as locally, with every failure reported.
 - On every push to `main`, the `Deploy` workflow ([`deploy.yml`](.github/workflows/deploy.yml)) prerenders the Site and publishes `dist/client/` to GitHub Pages.
 
 ## License
