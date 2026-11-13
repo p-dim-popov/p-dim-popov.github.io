@@ -2,7 +2,7 @@
 
 ### Issue tracker
 
-Issues live in GitHub Issues on `p-dim-popov/p-dim-popov`, managed with the `gh` CLI. See `docs/agents/issue-tracker.md`.
+Issues live in GitHub Issues on `p-dim-popov/p-dim-popov.github.io`, managed with the `gh` CLI. See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
