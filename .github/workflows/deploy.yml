@@ -19,6 +19,9 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    env:
+      # Loads `mise.toml` only, so the development tools in `mise.dev.toml` are skipped (ADR 0005).
+      MISE_ENV: ci
     permissions:
       contents: read
       # configure-pages reads the Pages settings and fails early if Pages is not set up.
@@ -28,19 +31,22 @@ jobs:
         with:
           persist-credentials: false
 
-      # Reads the pnpm version from the `packageManager` field in package.json.
-      - uses: pnpm/action-setup@v6
+      # Installs Node and pnpm at the versions in `mise.lock` (see `ci.yml`).
+      - uses: jdx/mise-action@v5
 
-      - uses: actions/setup-node@v7
+      - id: pnpm-store
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v6
         with:
-          node-version-file: mise.toml
-          cache: pnpm
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-store-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-store-${{ runner.os }}-
 
-      - run: pnpm install --frozen-lockfile
-
-      # Prerenders every page into dist/client/, the root of the published Site.
+      # Installs the dependencies, then prerenders every page into dist/client/, the root of
+      # the published Site.
       - name: Prerendered build
-        run: pnpm build
+        run: mise run build
 
       - uses: actions/configure-pages@v6
 

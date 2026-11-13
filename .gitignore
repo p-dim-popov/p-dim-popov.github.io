@@ -8,3 +8,6 @@ dist/
 .env*
 .DS_Store
 .claude/worktrees/
+mise.local.toml
+mise.local.lock
+.miserc.local.toml

@@ -14,37 +14,26 @@ jobs:
   checks:
     name: Checks
     runs-on: ubuntu-latest
+    env:
+      # Loads `mise.toml` only, so the development tools in `mise.dev.toml` are skipped (ADR 0005).
+      MISE_ENV: ci
     steps:
       - uses: actions/checkout@v7
 
-      # Reads the pnpm version from the `packageManager` field in package.json.
-      - uses: pnpm/action-setup@v6
+      # Installs Node and pnpm at the versions in `mise.lock`. A lockfile makes the action pass
+      # `--locked`, so a missing entry or a wrong checksum fails the run.
+      - uses: jdx/mise-action@v5
 
-      - uses: actions/setup-node@v7
+      - id: pnpm-store
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v6
         with:
-          node-version-file: mise.toml
-          cache: pnpm
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-store-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-store-${{ runner.os }}-
 
-      - id: install
-        run: pnpm install --frozen-lockfile
-
-      # Each check runs even when an earlier check fails, so one run reports every failure.
-      - name: Typecheck
-        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
-        run: pnpm typecheck
-
-      - name: Biome
-        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
-        run: pnpm exec biome ci .
-
-      - name: Module boundaries (dependency-cruiser)
-        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
-        run: pnpm boundaries
-
-      - name: Vitest
-        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
-        run: pnpm test
-
-      - name: Prerendered build
-        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
-        run: pnpm build
+      # The same `check` task as `mise run check` locally. With `--continue-on-error`, every
+      # check runs even when another fails, so one run reports every failure.
+      - name: Checks
+        run: mise run --continue-on-error check

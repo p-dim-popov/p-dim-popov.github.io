@@ -1,2 +1,87 @@
+# The toolchain and every task (ADR 0005). This file loads in every environment:
+# `mise.dev.toml` adds the tools a development machine needs, and `.miserc.toml` makes `dev`
+# the default. CI sets `MISE_ENV=ci`, which loads this file only.
+#
+# Each version here names a major (a minor for a 0.x tool). `mise.lock` holds the exact
+# version and checksum; `mise upgrade` moves it.
+
+# The version this setup was built and tested on. Older versions may misread `.miserc.toml`,
+# the per-environment lockfiles or the tasks.
+min_version = "2026.10.11"
+
 [tools]
-node = "26.12.0"
+node = "26"
+pnpm = "12"
+
+# Every task that needs `node_modules` depends on this one. It runs again only when the
+# dependency files change, or when `node_modules` is missing. pnpm leaves `.modules.yaml`
+# untouched when nothing changed, so the touch marks the install as current.
+[tasks.install]
+description = "Install the npm dependencies"
+hide = true
+run = ["pnpm install", "touch node_modules/.modules.yaml"]
+sources = ["package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml"]
+outputs = ["node_modules/.modules.yaml"]
+
+# `pnpm-lock.yaml` is a source too: a new Content Collections or zod version can change what
+# the build accepts or generates.
+[tasks.content]
+description = "Validate every Post's frontmatter and generate the content-collections module"
+depends = ["install"]
+run = "pnpm exec content-collections build --config src/features/blog/content-collections.ts"
+sources = [
+	"src/features/blog/posts/**/*.md",
+	"src/features/blog/content-collections.ts",
+	"pnpm-lock.yaml",
+]
+outputs = ["src/features/blog/.content-collections/**/*"]
+
+[tasks.dev]
+description = "Start the development server"
+depends = ["install"]
+run = "pnpm exec vite dev"
+
+[tasks.build]
+description = "Prerender the Site into dist/client/"
+depends = ["content"]
+# The Content Collections Vite plugin rewrites `.content-collections/` during the build. When
+# `check` runs typecheck and boundaries too, the build waits for them, so they never read a
+# half-written file. A plain `mise run build` waits for nothing.
+wait_for = ["typecheck", "boundaries"]
+run = "pnpm exec vite build"
+
+[tasks.typecheck]
+description = "Typecheck with tsc"
+depends = ["content"]
+run = "pnpm exec tsc --noEmit"
+
+[tasks.lint]
+description = "Lint and check formatting with Biome"
+depends = ["install"]
+run = "pnpm exec biome ci ."
+
+[tasks.format]
+description = "Apply Biome's formatting and import order"
+depends = ["install"]
+run = "pnpm exec biome check --write ."
+
+[tasks.boundaries]
+description = "Check the module boundaries with dependency-cruiser"
+depends = ["content"]
+run = "pnpm exec depcruise src --config .dependency-cruiser.mjs --output-type err-long"
+
+[tasks.test]
+description = "Run the Vitest tests"
+depends = ["install"]
+run = "pnpm exec vitest run"
+
+# What the pull-request workflow runs. CI adds `--continue-on-error`, so one run reports
+# every failing check.
+[tasks.check]
+description = "Run the pull-request checks: types, Biome, module boundaries, Vitest, build"
+depends = ["typecheck", "lint", "boundaries", "test", "build"]
+
+[tasks."serve:pages"]
+description = "Serve dist/client/ the way GitHub Pages does"
+usage = 'arg "[port]" help="The port to listen on" default="4173"'
+run = "node scripts/serve-pages.mjs ${usage_port}"
