@@ -22,6 +22,7 @@ The Site uses [TanStack Start](https://tanstack.com/start), React, Vite and Tail
 | [0002](docs/adr/0002-fully-static-prerendered-site.md)    | Prerender every route at build time. Run no server.                           |
 | [0003](docs/adr/0003-platform-feature-modulith.md)        | Split the code into platform and feature modules, with no shared code folder. |
 | [0004](docs/adr/0004-tailwind-over-panda.md)              | Use Tailwind CSS v4 instead of Panda CSS.                                     |
+| [0005](docs/adr/0005-mise-owns-toolchain-and-tasks.md)    | Let mise install the toolchain and run every task, locally and in CI.         |
 
 ### URLs
 
@@ -64,22 +65,22 @@ A Post is a Markdown file in `src/features/blog/posts/`. [Content Collections](h
 
 ## Development
 
-Install [mise](https://mise.jdx.dev/) and pnpm. mise supplies the Node version in `mise.toml`. pnpm switches itself to the version in the `packageManager` field of `package.json`.
+Install [mise](https://mise.jdx.dev/). It installs Node, pnpm and the other tools at the versions locked in `mise.lock` and `mise.dev.lock`, and it runs every task. Each task installs the npm dependencies first when they have changed.
 
 ```sh
-mise install       # install Node
-pnpm install       # install the dependencies
-pnpm dev           # start the development server
-pnpm check         # run the pull-request checks: types, Biome, module boundaries, Vitest, build
-pnpm build         # prerender the Site into dist/client/
-pnpm serve:pages   # serve dist/client/ the way GitHub Pages does (port 4173)
+mise install             # install the tools
+mise run dev             # start the development server
+mise run check           # run the pull-request checks: types, Biome, module boundaries, Vitest, build
+mise run build           # prerender the Site into dist/client/
+mise run serve:pages     # serve dist/client/ the way GitHub Pages does (port 4173)
+mise tasks ls            # list every task
 ```
 
 [`AGENTS.md`](AGENTS.md) gives the full architecture rules, every command, the toolchain notes and the steps to check a change in a browser. Coding agents and people can both follow it.
 
 ## CI and deployment
 
-- On every pull request, the `CI` workflow ([`ci.yml`](.github/workflows/ci.yml)) runs the same checks as `pnpm check`.
+- On every pull request, the `CI` workflow ([`ci.yml`](.github/workflows/ci.yml)) runs `mise run check`, the same checks as locally.
 - On every push to `main`, the `Deploy` workflow ([`deploy.yml`](.github/workflows/deploy.yml)) prerenders the Site and publishes `dist/client/` to GitHub Pages.
 
 ## License

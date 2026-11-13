@@ -1,6 +1,7 @@
 // Serves the prerendered build the way GitHub Pages serves it, for local checks.
 //
-// Usage: node scripts/serve-pages.mjs [port] [dir]   (defaults: 4173, dist/client)
+// Usage: `mise run serve:pages [port]`, or node scripts/serve-pages.mjs [port] [dir]
+//        (defaults: 4173, dist/client)
 //
 // - `/dir` answers 301 to `/dir/`.
 // - `/dir/` serves `dir/index.html`.
@@ -40,7 +41,7 @@ async function kindOf(path) {
 }
 
 if ((await kindOf(join(root, "404.html"))) !== "file") {
-	console.error(`No 404.html in ${root}. Run \`pnpm build\` first.`);
+	console.error(`No 404.html in ${root}. Run \`mise run build\` first.`);
 	process.exit(1);
 }
 

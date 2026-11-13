@@ -2,25 +2,12 @@
 	"name": "p-dim-popov",
 	"private": true,
 	"type": "module",
-	"packageManager": "pnpm@12.18.0",
 	"sideEffects": [
 		"**/*.css"
 	],
 	"imports": {
 		"#platform/*": "./src/platform/*/index.ts",
 		"#features/*": "./src/features/*/index.ts"
-	},
-	"scripts": {
-		"dev": "vite dev",
-		"content": "content-collections build --config src/features/blog/content-collections.ts",
-		"build": "pnpm content && vite build",
-		"serve:pages": "node scripts/serve-pages.mjs",
-		"typecheck": "pnpm content && tsc --noEmit",
-		"lint": "biome check .",
-		"format": "biome check --write .",
-		"boundaries": "pnpm content && depcruise src --config .dependency-cruiser.mjs --output-type err-long",
-		"test": "vitest run",
-		"check": "pnpm typecheck && pnpm lint && pnpm boundaries && pnpm test && pnpm build"
 	},
 	"dependencies": {
 		"@tanstack/markdown": "^1.2.0",

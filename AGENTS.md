@@ -29,24 +29,29 @@ The Site is prerendered with TanStack Start and served as static files by GitHub
 - **Nav.** Each feature exports its nav entry (`<feature>NavEntry`: a label and a route path) from its `index.ts`, and the root route lists them once, in nav order, in `createSiteDocument({ nav })`. That shell provides them to every page, the not-found page included. A layout reads them with `useNavEntries()` or renders `site`'s optional `SiteNav` and `SiteFooter`, so no feature imports another just to link to it. A new part of the Site exports its entry and adds it to the list in `src/routes/__root.tsx`. Typecheck rejects an entry whose path matches no route or lacks the trailing slash.
 - **Head and sitemap.** A page's own route returns `pageHead()` from `#platform/site` in `head()`, which sets the title, description, canonical URL and Open Graph tags. The root route's head holds document-wide tags only: the router does not deduplicate links, so a canonical URL there would appear twice. Start's sitemap lists every static route that has a component and every link the prerender crawls, so a dynamic page (a Post) is listed once a prerendered page links to it. The `pages` entries in `vite.config.ts` keep `/_/` and not-found out.
 
-`pnpm boundaries` (dependency-cruiser) enforces the import rules; each error names the rule and how to fix it.
+`mise run boundaries` (dependency-cruiser) enforces the import rules; each error names the rule and how to fix it.
 
 ## Commands
 
-First run: `mise install` (Node from `mise.toml`), then `pnpm install` (pnpm switches itself to the `packageManager` version).
+mise installs the toolchain and runs every task (ADR 0005). First run: `mise install`. It installs Node and pnpm, and on a development machine also agent-browser and the browser it drives. Each task installs the npm dependencies first when `package.json`, `pnpm-lock.yaml` or `pnpm-workspace.yaml` has changed. `mise tasks ls` lists every task.
 
-- `pnpm check` runs what the pull-request workflow runs, in order: `typecheck`, `lint` (Biome), `boundaries`, `test` (Vitest), `build`. Run it before you call a change done.
-- `pnpm format` applies Biome's formatting and import order.
-- `pnpm content` validates every Post's frontmatter and generates the `content-collections` module into `src/features/blog/.content-collections/` (git-ignored). `typecheck`, `boundaries` and `build` run it first, so each works on a fresh checkout.
-- `pnpm build` prerenders the Site into `dist/client/`. Invalid frontmatter, a broken internal link (in a Post too) or a failing route fails it.
-- `pnpm serve:pages <port>` serves `dist/client/` the way GitHub Pages does (see below).
+- `mise run check` runs what the pull-request workflow runs: `typecheck`, `lint` (Biome), `boundaries`, `test` (Vitest) and `build`, in parallel. It stops at the first failure; `mise run --continue-on-error check` reports every failure, as CI does. Run it before you call a change done.
+- `mise run format` applies Biome's formatting and import order.
+- `mise run content` validates every Post's frontmatter and generates the `content-collections` module into `src/features/blog/.content-collections/` (git-ignored). `typecheck`, `boundaries` and `build` depend on it, so each works on a fresh checkout. It is skipped when neither the Posts nor its config has changed.
+- `mise run build` prerenders the Site into `dist/client/`. Invalid frontmatter, a broken internal link (in a Post too) or a failing route fails it.
+- `mise run serve:pages <port>` serves `dist/client/` the way GitHub Pages does (see below). The port defaults to 4173.
+- `mise run dev` starts the development server.
 
 Toolchain gotchas:
 
-- `src/routeTree.gen.ts` is generated from `src/routes/` by `pnpm build` and `pnpm dev`. Commit it and leave it unedited. After adding or renaming a route file, run `pnpm build` before `pnpm typecheck`.
+- mise reads three files. `mise.toml` holds Node, pnpm and every task, for every environment. `mise.dev.toml` holds the tools only a development machine needs (agent-browser), and `.miserc.toml` makes `dev` the default environment. CI sets `MISE_ENV=ci`, so it loads `mise.toml` only. A CI-only tool goes in a new `mise.ci.toml`.
+- `mise.toml` and `mise.dev.toml` name a major version (a minor for a 0.x tool). `mise.lock` and `mise.dev.lock` hold the exact versions and checksums for `linux-x64`. `mise upgrade` moves them within the major. After you edit a version, run `mise lock --platform linux-x64` (add `-E ci` once `mise.ci.toml` exists) and commit the lockfiles. CI installs with `--locked`, so a tool missing from a lockfile fails it.
+- Tasks live in `mise.toml`, and mise pins pnpm, so `package.json` has no `scripts` and no `packageManager`. Tasks call package binaries with `pnpm exec <bin>`.
+- In a new clone or worktree, run `mise install` first: it trusts the project's mise config and installs the tools. Until then, an activated shell warns that `mise.dev.toml` is not trusted.
+- `src/routeTree.gen.ts` is generated from `src/routes/` by `mise run build` and `mise run dev`. Commit it and leave it unedited. After adding or renaming a route file, run `mise run build` before `mise run typecheck`.
 - TypeScript stays on 6.x: dependency-cruiser reads `.ts` files through the TypeScript compiler API, which TypeScript 7 does not ship.
 - Biome is pinned to an exact version: the arbitrary-value rule is a nursery rule, and nursery rules can change in any release. Upgrade Biome on purpose and re-check that the rule still fires.
-- Build with `pnpm build`, not a bare `vite build`. The Content Collections Vite plugin fails on invalid frontmatter only when `NODE_ENV` is `production`; `pnpm content` fails whatever `NODE_ENV` is.
+- Build with `mise run build`, not a bare `vite build`. The Content Collections Vite plugin fails on invalid frontmatter only when `NODE_ENV` is `production`; `mise run content`, which `build` depends on, fails whatever `NODE_ENV` is.
 - `package.json` declares `"sideEffects": ["**/*.css"]`, so the bundler drops the unused re-exports of a module's `index.ts`. Without it, every page shipped the Markdown renderer. A file that must run only for its side effects needs an entry there.
 - `pnpm-workspace.yaml` approves esbuild's install script (`allowBuilds`), which Content Collections needs. pnpm fails the install on a dependency whose build script is not approved.
 - Biome formats Markdown, and `markdown.parser.frontmatter` keeps it from rewriting a Post's frontmatter as a heading.
@@ -54,11 +59,11 @@ Toolchain gotchas:
 
 ## Verifying in a browser
 
-Verify what ships: the prerendered build, served the way GitHub Pages serves it. `pnpm dev` has no `404.html` and no Pages redirects, so it can't stand in.
+Verify what ships: the prerendered build, served the way GitHub Pages serves it. `mise run dev` has no `404.html` and no Pages redirects, so it can't stand in.
 
 Parallel agents share one machine, so each agent uses its own port and its own agent-browser sessions. Derive both from your issue number N: port `43N0` (issue #12 → `43120`) and sessions `t<N>-1`, `t<N>-2`, ….
 
-1. Run `pnpm build`, then `pnpm serve:pages 43N0` in the background. It serves the last build, so rebuild after every change.
+1. Run `mise run build`, then `mise run serve:pages 43N0` in the background. It serves the last build, so rebuild after every change.
 2. Check status codes with `curl -s -o /dev/null -w '%{http_code}\n' <url>`: real pages give 200, unknown URLs (at the root and under `/_/`) give 404, and a URL without its trailing slash gives 301.
 3. Open each URL in a **fresh** session. agent-browser keeps page errors across navigations within one session, so a reused session blames a page for an earlier page's errors.
 

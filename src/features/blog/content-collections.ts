@@ -7,9 +7,9 @@ import { z } from "zod";
  * Two collections read the same files, so that summaries and bodies are generated into
  * separate modules. A page that only lists Posts imports the summaries and never ships a body.
  *
- * `pnpm content` validates the frontmatter and generates both collections into
+ * `mise run content` validates the frontmatter and generates both collections into
  * `.content-collections/`, which the `content-collections` import resolves to.
- * Invalid frontmatter fails it, and so fails `pnpm build`.
+ * Invalid frontmatter fails it, and so fails `mise run build`.
  */
 
 const postSummaries = defineCollection({

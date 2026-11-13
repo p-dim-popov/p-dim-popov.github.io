@@ -1,0 +1,7 @@
+# Tools that only a development machine needs. `.miserc.toml` makes `dev` the default
+# environment; CI runs with `MISE_ENV=ci` and skips this file. `mise.dev.lock` holds the exact
+# versions.
+
+[tools]
+# The browser check in AGENTS.md. `agent-browser install` downloads the browser it drives.
+agent-browser = { version = "0.42", postinstall = "agent-browser install" }
